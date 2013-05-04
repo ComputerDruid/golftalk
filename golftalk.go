@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"os"
 	"io"
+	"code.google.com/p/go.crypto/ssh/terminal"
 )
 
 // TODO: Is this really the best way to do this recursive type embedding thing?
@@ -269,13 +270,21 @@ func main() {
 	};
 
 	in := bufio.NewReader(os.Stdin)
+	isTerminal := false
+	if terminal.IsTerminal(int(os.Stdin.Fd())) {
+		isTerminal = true
+	}
 
 	for true {
-		fmt.Print("golftalk~$ ")
+		if isTerminal {
+			fmt.Print("golftalk~$ ")
+		}
 		line, err := in.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				fmt.Println() //end line with prompt on it
+				if isTerminal {
+					fmt.Println() //end line with prompt on it
+				}
 				break //We should end the REPL if EOF is reached
 			} else {
 				panic(err) //something went wrong...
